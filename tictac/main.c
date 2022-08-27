@@ -1,8 +1,3 @@
-/*
- * This is a simple tic-tac-toe game written as an exercise in the use
- * of two-dimensional arrays and conditional operators.
- */
-
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -12,7 +7,6 @@
 int  go_bananas  (int [][NR_COLS]);
 void print_board (int [][NR_COLS]);
 void get_move    (int *, char *);
-int  check_move  (int [][NR_COLS], int, int);
 int  check_win   (int [][NR_COLS], int);
 
 int main(void)
@@ -75,14 +69,14 @@ int go_bananas(int board[][NR_COLS])
         do {
             get_move(&row, "row");
             get_move(&col, "column");
-            is_legal = check_move(board, row, col);
+            is_legal = board[row-1][col-1] ? 0 : 1;
             if (!is_legal)
                 printf("Illegal move! Shame on you!!!\n\n");
         } while (!is_legal);
 
         board[row-1][col-1] = player ? 2 : 1;
 
-        has_won = check_win(board, player);
+        has_won = check_win(board, player ? 2 : 1);
         
         if (has_won)
             return player ? 2 : 1;
@@ -99,9 +93,9 @@ int go_bananas(int board[][NR_COLS])
 void print_board(int board[][NR_COLS])
 {
     #ifdef _WIN32
-        system("cls");
+    system("cls");
     #else
-        system("clear");
+    system("clear");
     #endif
 
     printf("    1   2   3 \n");
@@ -127,32 +121,22 @@ void get_move(int *move, char *prompt)
     } while (!(1 <= *move && *move <= 3));
 }
 
-int check_move(int board[][NR_COLS], int row, int col)
+int check_win(int board[][NR_COLS], int s)
 {
-    if (board[row-1][col-1] == 0)
-        return 1;
-    else
-        return 0;
-}
-
-int check_win(int board[][NR_COLS], int player)
-{
-    int symbol = player ? 2 : 1;
-
     /* There are a total of eight win conditions in tic-tac-toe. We
      * check for each one of them here.
      */
     if (/* Symbols are horizontally aligned. */
-        (board[0][0] == symbol && board[0][1] == symbol && board[0][2] == symbol) ||
-        (board[1][0] == symbol && board[1][1] == symbol && board[1][2] == symbol) ||
-        (board[2][0] == symbol && board[2][1] == symbol && board[2][2] == symbol) ||
+        (board[0][0] == s && board[0][1] == s && board[0][2] == s) ||
+        (board[1][0] == s && board[1][1] == s && board[1][2] == s) ||
+        (board[2][0] == s && board[2][1] == s && board[2][2] == s) ||
         /* Symbols are vertically aligned. */
-        (board[0][0] == symbol && board[1][0] == symbol && board[2][0] == symbol) ||
-        (board[0][1] == symbol && board[1][1] == symbol && board[2][1] == symbol) ||
-        (board[0][2] == symbol && board[1][2] == symbol && board[2][2] == symbol) ||
+        (board[0][0] == s && board[1][0] == s && board[2][0] == s) ||
+        (board[0][1] == s && board[1][1] == s && board[2][1] == s) ||
+        (board[0][2] == s && board[1][2] == s && board[2][2] == s) ||
         /* Symbols are diagonally aligned. */
-        (board[0][0] == symbol && board[1][1] == symbol && board[2][2] == symbol) ||
-        (board[0][2] == symbol && board[1][1] == symbol && board[2][0] == symbol))
+        (board[0][0] == s && board[1][1] == s && board[2][2] == s) ||
+        (board[0][2] == s && board[1][1] == s && board[2][0] == s))
         return 1;
     else
         return 0;
