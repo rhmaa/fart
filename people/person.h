@@ -12,7 +12,9 @@ typedef struct {
     unsigned int age;    /* The age of the person  */
 } person;
 
-void make_person    (person *,  int, char *, int, int);
+void make_person    (person *,  int);
+void edit_person    (person *,  int);
+void load_person    (person *,  int, char *, int, int);
 void kill_person    (person *,  int, int);
 void grow_people    (person **, int *);
 void shrink_people  (person **, int *);
@@ -20,7 +22,7 @@ void sort_people    (person *,  int);
 void list_people    (person *,  int);
 void rename_person  (person *,  int);
 void save_people    (person *,  int);
-void load_people    (person **, int *);
+int  load_people    (person **, int *);
 void destroy_people (person *,  int);
 void birthday       (person *,  int);
 

@@ -11,9 +11,6 @@
  *
  * The user is able to save the list, and load the list. The list is
  * automatically saved when the program exits.
- * 
- * At some point I will experiment with adding some actual menu driven
- * interface.
  */
 
 #include <stdio.h>
@@ -22,64 +19,105 @@
 
 #include "person.h"
 
+int  menu         (person **, int *);
+int  get_menu_ans ();
+void get_index    (int, int *);
+
 int main()
 {
-    person *people;
-    int nr_people = 3;
+    /* The number of people that exists in the list. */
+    int nr_people = 0;
 
-    people = malloc(nr_people * sizeof(person));
+    /* The list of people to manage. */
+    person *people;
+    people = calloc(nr_people, sizeof(person));
     if (people == NULL) {
-        perror("malloc failed");
+        perror("malloc in main() failed");
         exit(1);
     }
 
-    printf("--- We have made three people ---\n");
-    make_person(people, 0, "John", 1, 26);
-    make_person(people, 1, "Jennifer", 0, 24);
-    make_person(people, 2, "Kate", 0, 32);
+    /* If we have a save file, then read the contents. */
+    if (load_people(&people, &nr_people) != 0)
+        ;
 
-    list_people(people, nr_people);
+    int is_running = 1;
+    while (is_running)
+        is_running = menu(&people, &nr_people);
 
-    printf("--- Now we are adding one more ---\n");
-    grow_people(&people, &nr_people);
-    make_person(people, (nr_people - 1), "Bill", 1, 45);
-    list_people(people, nr_people);
-
-    printf("--- And add one more again ---\n");
-    grow_people(&people, &nr_people);
-    make_person(people, (nr_people - 1), "Jill", 0, 20);
-    list_people(people, nr_people);
-
-    printf("--- Now we kill one person ---\n");
-    kill_person(people, 0, nr_people);
-    shrink_people(&people, &nr_people);
-    list_people(people, nr_people);
-
-    printf("--- Now we rename another one ---\n");
-    rename_person(people, 3);
-    sort_people(people, nr_people);
-    list_people(people, nr_people);
-
-    printf("--- We are now killing everyone :o ---\n\n");
     save_people(people, nr_people);
     destroy_people(people, nr_people);
     free(people);
 
-    nr_people = 1;
-    people = malloc(nr_people * sizeof(person));
-    if (people == NULL) {
-        perror("malloc failed");
-        exit(1);
-    }
-
-    load_people(&people, &nr_people);
-
-    printf("--- But that's ok, because we saved them earlier :D ---\n\n");
-    list_people(people, nr_people);
-
-    destroy_people(people, nr_people);
-    free(people);
-
     return 0;
+}
 
+int menu(person **people, int *nr_people)
+{
+    /* Stores the index of the person that the user wishes to edit. */
+    int index;
+
+    /* Stores the user's menu choice. */
+    int ans = get_menu_ans();
+
+    switch (ans) {
+    case 1:
+        grow_people(people, nr_people);
+        make_person(*people, (*nr_people - 1));
+        save_people(*people, *nr_people);
+        break;
+        
+    case 2:
+        get_index(*nr_people, &index);
+        edit_person(*people, index);
+        save_people(*people, *nr_people);
+        break;
+
+    case 3:
+        get_index(*nr_people, &index);
+        kill_person(*people, index, *nr_people);
+        shrink_people(people, nr_people);
+        save_people(*people, *nr_people);
+        break;
+        
+    case 4:
+        sort_people(*people, *nr_people);
+        list_people(*people, *nr_people);
+        break;
+
+    case 0:
+        return 0;
+    }
+    return 1;
+}
+
+int get_menu_ans()
+{
+    int ans = 0;
+    
+    do {
+        printf("\n");
+        printf("1. Add person\n");
+        printf("2. Edit person\n");
+        printf("3. Delete a person\n");
+        printf("4. List people\n");
+        printf("0. Exit\n");
+
+        printf("i: ");
+        if (get_int(&ans) != 0)
+            printf("error: Expected an integer.\n");
+    } while (!(0 <= ans && ans <= 4));
+    printf("\n");
+
+    return ans;
+}
+
+void get_index(int nr_people, int *index)
+{
+    printf("Enter the index of the person to delete: ");
+    do {
+        if (get_int(index) != 0) {
+            printf("error: Invalid input.\n");
+            printf("Please enter an index between 0 and %d: ", nr_people - 1);
+        }
+    } while (!(0 <= *index && *index < nr_people));
 }

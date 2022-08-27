@@ -4,18 +4,42 @@
 
 #include "person.h"
 
-void make_person(person *people, int index, char *name, int sex, int age)
+void make_person(person *people, int index)
 {
-    people[index].name = malloc(strlen(name) * sizeof(char));
+    people[index].name = calloc(MAX_STR_LENGTH, sizeof(char));
     if (people[index].name == NULL) {
-        perror("failed to malloc people[index].name");
+        perror("calloc in make_person() failed");
         exit(1);
     }
+    edit_person(people, index);
+}
+
+void edit_person(person *people, int index)
+{
+    char name[MAX_STR_LENGTH];
+    int  sex;
+    int  age;
+
+    get_name(name);
+    get_sex(&sex);
+    get_age(&age);
 
     strncpy(people[index].name, name, strlen(name));
+    people[index].sex = sex;
+    people[index].age = age;
+}
 
-    people[index].sex  = sex;
-    people[index].age  = age;
+void load_person(person *people, int index, char *name, int sex, int age)
+{
+    people[index].name = calloc(strlen(name), sizeof(char));
+    if (people[index].name == NULL) {
+        perror("calloc in load_person() failed");
+        exit(1);
+    }
+    strncpy(people[index].name, name, strlen(name));
+
+    people[index].sex = sex;
+    people[index].age = age;
 }
 
 void kill_person(person *people, int index, int nr_people)
@@ -65,7 +89,7 @@ void shrink_people(person **people, int *nr_people)
 
     tmp = realloc(*people, (*nr_people - 1) * sizeof(person));
     if (tmp == NULL) {
-        perror("realloc in grow_people() failed");
+        perror("realloc in shrink_people() failed");
         exit(1);
     } else {
         *people = tmp;
@@ -91,12 +115,9 @@ void sort_people(person *people, int nr_people)
 
 void list_people(person *people, int nr_people)
 {
-    for (int i = 0; i < nr_people; ++i) {
-        printf("My name is %s, I am a %s, and I am %d years old\n",
-               people[i].name, people[i].sex ? "boy" : "girl",
-               people[i].age);
-    }
-    printf("\n");
+    for (int i = 0; i < nr_people; ++i)
+        printf("%d\t%s\t%s\t%d\n", i, people[i].name,
+               people[i].sex ? "M" : "F", people[i].age);
 }
 
 void destroy_people(person *people, int nr_people)
@@ -111,9 +132,17 @@ void rename_person(person *people, int index)
     printf("Please enter %s's new name: ", people[index].name);
     if (fgets(name, MAX_STR_LENGTH, stdin) != NULL) {
         name[strcspn(name, "\n")] = 0;
+
+        /* When we enter a name that is shorter than the original
+         * name, the last letters of the first name will still be
+         * present in the person's name.
+         *
+         * TODO(rha): Implement code that trims the remaining letters
+         * from the original name.
+         */
         strncpy(people[index].name, name, strlen(name));
     } else {
-        fprintf(stderr, "fgets could not write to name");
+        perror("fgets in rename_person could not write to name");
         exit(1);
     }
 }
@@ -146,7 +175,7 @@ void save_people(person *people, int nr_people)
     fclose(savefile);
 }
 
-void load_people(person **people, int *nr_people)
+int load_people(person **people, int *nr_people)
 {
     FILE *savefile;
 
@@ -162,31 +191,36 @@ void load_people(person **people, int *nr_people)
         strcpy(filepath, "/tmp/people");
     #endif
 
-    savefile = fopen(filepath, "r");
-    fscanf(savefile, "%d", nr_people);
+    if (savefile = fopen(filepath, "r")) {
+        fscanf(savefile, "%d", nr_people);
 
-    person *tmp;
+        person *tmp;
 
-    tmp = realloc(*people, (*nr_people) * sizeof(person));
-    if (tmp == NULL) {
-        perror("realloc in grow_people() failed");
-        exit(1);
-    } else {
-        *people = tmp;
-    }
+        tmp = realloc(*people, (*nr_people) * sizeof(person));
+        if (tmp == NULL) {
+            perror("realloc in grow_people() failed");
+            exit(1);
+        } else {
+            *people = tmp;
+        }
 
-    char name[MAX_STR_LENGTH];
-    unsigned int sex;
-    unsigned int age;
+        char name[MAX_STR_LENGTH];
+        unsigned int sex;
+        unsigned int age;
 
-    for (int i = 0; i < *nr_people; ++i) {
-        fscanf(savefile, "%s", &name);
-        fscanf(savefile, "%d", &sex);
-        fscanf(savefile, "%d", &age);
-        make_person(*people, i, name, sex, age);
-    }
+        for (int i = 0; i < *nr_people; ++i) {
+            fscanf(savefile, "%s", &name);
+            fscanf(savefile, "%d", &sex);
+            fscanf(savefile, "%d", &age);
+            load_person(*people, i, name, sex, age);
+        }
     
-    fclose(savefile);
+        fclose(savefile);
+
+        return 0;
+    } else {
+        return 1;
+    }
 }
 
 void birthday(person *people, int index)
@@ -200,23 +234,23 @@ void get_name(char *name)
     if (fgets(name, MAX_STR_LENGTH, stdin) != NULL) {
         name[strcspn(name, "\n")] = 0;
     } else {
-        perror("fgets could not write to name");
+        perror("fgets in get_name could not write to name");
         exit(1);
     }
 }
 
 void get_sex(unsigned int *sex)
 {
+    /* TODO(rha): Rewrite this so that the user can enter 'F' or 'M'
+     * instead of 0 and 1.
+     */
     printf("Please enter the person's sex (0 for female or 1 for male): ");
-
-    while (get_int(sex) != 0) {
-        printf("error: Expected integer input.\n");
-        printf("Please enter a valid age: ");
-    }
-
-    while (!(0 <= *sex && *sex <= 1)) {
-        get_int(sex);
-    }
+    do {
+        if (get_int(sex) != 0) {
+            printf("error: Expected an integer input.\n");
+            printf("Please enter a valid sex: ");
+        }
+    } while (!(0 <= *sex && *sex <= 1));
 }
 
 void get_age(unsigned int *age)
@@ -237,15 +271,14 @@ int get_int(int *a)
 
 	char *buffer;
 
-    buffer = malloc(MAX_STR_LENGTH * sizeof(char));
+    buffer = calloc(MAX_STR_LENGTH, sizeof(char));
     if (buffer == NULL) {
-        perror("failed to malloc buffer");
+        perror("calloc in get_int() failed");
         exit(1);
     }
 
 	fgets(buffer, MAX_STR_LENGTH, stdin);
 	buffer[strcspn(buffer, "\n")] = 0;
-
 
     /* Check if the characters are digits or not. If the characters
 	 * are not within the ASCII range for digits, this function
