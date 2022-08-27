@@ -41,17 +41,15 @@ int main(void)
 
 void go_bananas(int board[][NR_COLS])
 {
-    /* This variable determines which player's turn it is. 0 means
-     * that it's player 1's turn, 1 means that it's player 2's
-     * turn.
+    /* player_to_move determines which player's turn it is. 0 means
+     * that it's player 1's turn, 1 means that it's player 2's turn.
      */
     int player_to_move = 0;
 
     for (int i = 0; i < (NR_ROWS * NR_COLS); ++i) {
         print_board(board);
 
-        printf("\n");
-        printf("Player %d, your move!\n\n", player_to_move ? 2 : 1);
+        printf("\nPlayer %d, your move!\n\n", player_to_move ? 2 : 1);
 
         int is_legal = 0;
         int row, col;
@@ -67,12 +65,11 @@ void go_bananas(int board[][NR_COLS])
 
         /* Place the player's symbol on the board. */
         board[row-1][col-1] = (player_to_move ? 2 : 1);
-        printf("\n");
 
         /* Check if the player has won. */
-        int is_over = check_win(board, player_to_move);
+        int has_won = check_win(board, player_to_move);
         
-        if (is_over) {
+        if (has_won) {
             print_board(board);
             printf("\n--- Congratulations player %d, you have won! ---\n\n", player_to_move ? 2 : 1);
             break;
@@ -81,7 +78,7 @@ void go_bananas(int board[][NR_COLS])
             printf("\n--- It's a draw! ---\n\n");
             break;
         } else {
-            player_to_move += player_to_move ? -1 : 1;
+            player_to_move = player_to_move ? 0 : 1;
         }
     }
 }
@@ -98,9 +95,10 @@ void print_board(int board[][NR_COLS])
     printf("  +---+---+---+\n");
     for (int i = 0; i < NR_ROWS; ++i) {
         printf("%d |", i + 1);
-        for (int j = 0; j < NR_COLS; ++j) {
+
+        for (int j = 0; j < NR_COLS; ++j)
             printf(" %c |", (board[i][j] ? (board[i][j] == 1 ? 'X' : 'O') : ' '));
-        }
+
         printf("\n  +---+---+---+\n");
     }
 }
@@ -110,9 +108,8 @@ void get_move(int *move, char *prompt)
     printf("Enter the %s number: ", prompt);
     do {
         scanf("%d", move);
-        if (!(1 <= *move && *move <= 3)) {
+        if (!(1 <= *move && *move <= 3))
             printf("Enter a valid number: ");
-        }
     } while (!(1 <= *move && *move <= 3));
 }
 
@@ -131,9 +128,18 @@ int check_win(int board[][NR_COLS], int player)
 {
     int symbol = player ? 2 : 1;
 
-    if ((board[0][0] == symbol && board[0][1] == symbol && board[0][2] == symbol) ||
+    /* There are a total of eight win conditions in tic-tac-toe. We
+     * check for each one of them.
+     */
+    if (/* Symbols are horizontally aligned. */
+        (board[0][0] == symbol && board[0][1] == symbol && board[0][2] == symbol) ||
         (board[1][0] == symbol && board[1][1] == symbol && board[1][2] == symbol) ||
         (board[2][0] == symbol && board[2][1] == symbol && board[2][2] == symbol) ||
+        /* Symbols are vertically aligned. */
+        (board[0][0] == symbol && board[1][0] == symbol && board[2][0] == symbol) ||
+        (board[0][1] == symbol && board[1][1] == symbol && board[2][1] == symbol) ||
+        (board[0][2] == symbol && board[1][2] == symbol && board[2][2] == symbol) ||
+        /* Symbols are diagonally aligned. */
         (board[0][0] == symbol && board[1][1] == symbol && board[2][2] == symbol) ||
         (board[0][2] == symbol && board[1][1] == symbol && board[2][0] == symbol))
         return 1;
