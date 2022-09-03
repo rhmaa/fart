@@ -36,8 +36,8 @@ void load_person(person *people, int index, char *name, int sex, int age)
         perror("calloc in load_person() failed");
         exit(1);
     }
-    strncpy(people[index].name, name, strlen(name));
 
+    strncpy(people[index].name, name, strlen(name));
     people[index].sex = sex;
     people[index].age = age;
 }
@@ -74,6 +74,7 @@ void grow_people(person **people, int *nr_people)
     person *tmp;
 
     tmp = realloc(*people, (*nr_people + 1) * sizeof(person));
+
     if (tmp == NULL) {
         perror("realloc in grow_people() failed");
         exit(1);
@@ -87,7 +88,9 @@ void shrink_people(person **people, int *nr_people)
 {
     person *tmp;
 
-    tmp = realloc(*people, (*nr_people - 1) * sizeof(person));
+    if (*nr_people > 1)
+        tmp = realloc(*people, (*nr_people - 1) * sizeof(person));
+
     if (tmp == NULL) {
         perror("realloc in shrink_people() failed");
         exit(1);
@@ -115,9 +118,13 @@ void sort_people(person *people, int nr_people)
 
 void list_people(person *people, int nr_people)
 {
-    for (int i = 0; i < nr_people; ++i)
-        printf("%d\t%s\t%s\t%d\n", i, people[i].name,
-               people[i].sex ? "M" : "F", people[i].age);
+
+    if (nr_people != 0) {
+        for (int i = 0; i < nr_people; ++i)
+            printf("%d\t%s\t%s\t%d\n", i, people[i].name, people[i].sex ? "M" : "F", people[i].age);
+    } else {
+        printf("No people to print.\n");
+    }
 }
 
 void destroy_people(person *people, int nr_people)
@@ -156,11 +163,11 @@ void save_people(person *people, int nr_people)
      * on the type of operating system that the user has. If they're
      * not on Windows, then we assume they are using a Unix system.
      */
-    #ifdef _WIN32
-        strcpy(filepath, "\%userprofile\%\\AppData\\Local\\Temp\\people");
-    #else
-        strcpy(filepath, "/tmp/people");
-    #endif
+#ifdef _WIN32
+    strcpy(filepath, "\%userprofile\%\\AppData\\Local\\Temp\\people");
+#else
+    strcpy(filepath, "/tmp/people");
+#endif
 
     savefile = fopen(filepath, "w+");
 
@@ -185,15 +192,16 @@ int load_people(person **people, int *nr_people)
      * on the type of operating system that the user has. If they're
      * not on Windows, then we assume they are using a Unix system.
      */
-    #ifdef _WIN32
-        strcpy(filepath, "\%userprofile\%\\AppData\\Local\\Temp\\people");
-    #else
-        strcpy(filepath, "/tmp/people");
-    #endif
+#ifdef _WIN32
+    strcpy(filepath, "\%userprofile\%\\AppData\\Local\\Temp\\people");
+#else
+    strcpy(filepath, "/tmp/people");
+#endif
 
-    if (savefile = fopen(filepath, "r")) {
+    if (savefile = fopen(filepath, "r"))
         fscanf(savefile, "%d", nr_people);
 
+    if (*nr_people > 0) {
         person *tmp;
 
         tmp = realloc(*people, (*nr_people) * sizeof(person));
@@ -241,9 +249,6 @@ void get_name(char *name)
 
 void get_sex(unsigned int *sex)
 {
-    /* TODO(rha): Rewrite this so that the user can enter 'F' or 'M'
-     * instead of 0 and 1.
-     */
     printf("Please enter the person's sex (0 for female or 1 for male): ");
     do {
         if (get_int(sex) != 0) {
@@ -268,34 +273,25 @@ int get_int(int *a)
      * most. This is a simple function that should be somewhat more
      * safer than the default methods.
      */
+    char buffer[MAX_STR_LENGTH];
 
-	char *buffer;
-
-    buffer = calloc(MAX_STR_LENGTH, sizeof(char));
-    if (buffer == NULL) {
-        perror("calloc in get_int() failed");
-        exit(1);
-    }
-
-	fgets(buffer, MAX_STR_LENGTH, stdin);
-	buffer[strcspn(buffer, "\n")] = 0;
+    fgets(buffer, MAX_STR_LENGTH, stdin);
+    buffer[strcspn(buffer, "\n")] = 0;
 
     /* Check if the characters are digits or not. If the characters
-	 * are not within the ASCII range for digits, this function
-	 * returns a non-zero value.
-	 */
-	int is_digit = 1;
+     * are not within the ASCII range for digits, this function
+     * returns a non-zero value.
+     */
+    int is_digit = 1;
 
-	for (int i = 0; i < strlen(buffer); ++i)
-		if (!(48 <= buffer[i] && buffer[i] <= 58))
-			is_digit = 0;
+    for (int i = 0; i < strlen(buffer); ++i)
+        if (!(48 <= buffer[i] && buffer[i] <= 58))
+            is_digit = 0;
 
-	if (is_digit) {
-		*a = atoi(buffer);
-        free(buffer);
-		return 0;
-	} else {
-        free(buffer);
-		return 1;
-	}
+    if (is_digit) {
+        *a = atoi(buffer);
+        return 0;
+    } else {
+        return 1;
+    }
 }

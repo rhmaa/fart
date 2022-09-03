@@ -30,7 +30,7 @@ int main()
 
     /* The list of people to manage. */
     person *people;
-    people = calloc(nr_people, sizeof(person));
+    people = malloc(sizeof(person) * nr_people);
     if (people == NULL) {
         perror("malloc in main() failed");
         exit(1);
@@ -45,7 +45,6 @@ int main()
         is_running = menu(&people, &nr_people);
 
     save_people(people, nr_people);
-    destroy_people(people, nr_people);
     free(people);
 
     return 0;
