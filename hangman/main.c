@@ -154,8 +154,7 @@ void get_guess(char *guess)
         return;
     } else {
         buffer[strcspn(buffer, "\n")] = 0;
-        buffer[0] = tolower(buffer[0]);
-        guess[0] = buffer[0];
+        guess[0] = tolower(buffer[0]);
     }
 }
 
