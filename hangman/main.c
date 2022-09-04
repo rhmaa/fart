@@ -3,6 +3,9 @@
   
   A list of words are read from a file provided by the player. A
   random word is picked, and the player has to guess which word it is.
+
+  The game is over when the player has guessed the correct word, or
+  when they've run out of chances.
  ***********************************************************************/
 
 #include <stdio.h>
@@ -22,10 +25,9 @@
 char ** load_words    (char **, char *);
 char *  get_rand_word (char **);
 int     go_bananas    (char *);
-int     check_guess   (char, char *);
+int     check_guess   (char, char *, char *);
 void    print_word    (char *);
 void    get_guess     (char *);
-void    save_guess    (char, char *, char *);
 
 int main(int argc, char **argv)
 {
@@ -87,8 +89,8 @@ int go_bananas(char *word)
      */
     char guess;
 
-    /* All the player's guesses. When guesses == word, the player has
-     * won.
+    /* The player's correct guesses. When guesses == word, the player
+     * has won.
      */
     char *guesses;
 
@@ -108,39 +110,36 @@ int go_bananas(char *word)
         printf("Your guess: ");
         get_guess(&guess);
 
-        /* Only save the guess if it's actually correct. */
-        if (check_guess(guess, word) == 0)
-            save_guess(guess, guesses, word);
+        if (check_guess(guess, guesses, word) == 1)
+            ;
         else
             ++chances_used;
 
         if (strcmp(guesses, word) == 0) {
-            printf("\n");
             print_word(guesses);
             free(guesses);
             return 1;
         }
     }
 
+    print_word(guesses);
     free(guesses);
 
     return 0;
 }
 
-int check_guess(char guess, char *word)
+int check_guess(char guess, char *guesses, char *word)
 {
-    for (int i = 0; i < strlen(word); ++i)
-        if (guess == word[i])
-            return 0;
+    int is_correct = 0;
 
-    return 1;
-}
-
-void save_guess(char guess, char *guesses, char *word)
-{
-    for (int i = 0; i < strlen(word); ++i)
-        if (guess == word[i])
+    for (int i = 0; i < strlen(word); ++i) {
+        if (guess == word[i]) {
             guesses[i] = guess;
+            is_correct = 1;
+        }
+    }
+
+    return is_correct;
 }
 
 void get_guess(char *guess)
@@ -160,10 +159,12 @@ void get_guess(char *guess)
 
 void print_word(char *guesses)
 {
+    printf("\n");
+    
     for (int i = 0; i < strlen(guesses); ++i)
         printf("%c ", guesses[i]);
 
-    printf("\n");
+    printf("\n\n");
 }
 
 char ** load_words(char **words, char *filepath)
