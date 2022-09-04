@@ -27,7 +27,7 @@ char ** load_words    (char **, char *);
 char *  get_rand_word (char **);
 int     go_bananas    (char *);
 int     check_guess   (char, char *, char *);
-void    print_word    (char *);
+void    print_guesses (char *);
 void    get_guess     (char *);
 
 int main(int argc, char **argv)
@@ -107,7 +107,7 @@ int go_bananas(char *word)
         printf("\nYou have %d %s left.\n", NR_CHANCES - chances_used,
                (NR_CHANCES - chances_used == 1) ? "chance" : "chances");
 
-        print_word(guesses);
+        print_guesses(guesses);
         printf("Your guess: ");
         get_guess(&guess);
 
@@ -117,13 +117,13 @@ int go_bananas(char *word)
             ++chances_used;
 
         if (strcmp(guesses, word) == 0) {
-            print_word(guesses);
+            print_guesses(guesses);
             free(guesses);
             return 1;
         }
     }
 
-    print_word(guesses);
+    print_guesses(guesses);
     free(guesses);
 
     return 0;
@@ -144,6 +144,7 @@ int check_guess(char guess, char *guesses, char *word)
 }
 
 void get_guess(char *guess)
+
 {
     char buffer[MAX_WORD_LEN];
 
@@ -158,7 +159,7 @@ void get_guess(char *guess)
     }
 }
 
-void print_word(char *guesses)
+void print_guesses(char *guesses)
 {
     printf("\n");
     
