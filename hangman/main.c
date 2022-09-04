@@ -8,6 +8,7 @@
   when they've run out of chances.
  ***********************************************************************/
 
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -33,7 +34,7 @@ int main(int argc, char **argv)
 {
     /* The list of words from which we will pick a random word. */
     char **words;
-
+    
     /* The random word that the player has to guess. */
     char *rand_word;
 
@@ -153,6 +154,7 @@ void get_guess(char *guess)
         return;
     } else {
         buffer[strcspn(buffer, "\n")] = 0;
+        buffer[0] = tolower(buffer[0]);
         guess[0] = buffer[0];
     }
 }
