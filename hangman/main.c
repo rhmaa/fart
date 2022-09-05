@@ -150,13 +150,10 @@ void get_guess(char *guess)
 
     fgets(buffer, MAX_WORD_LEN, stdin);
 
-    if (strlen(buffer) != 2) {
+    if (strlen(buffer) != 2)
         printf("\nYou should only enter one character, you naughty boy.\n");
-        return;
-    } else {
-        buffer[strcspn(buffer, "\n")] = 0;
+    else
         guess[0] = tolower(buffer[0]);
-    }
 }
 
 void print_guesses(char *guesses)
@@ -211,7 +208,7 @@ char ** load_words(char **words, char *filepath)
 
     for (int i = 0; i < nr_lines; ++i) {
         fgets(word, MAX_WORD_LEN, fp);
-        words[i] = calloc(strlen(word), sizeof(char));
+        words[i] = calloc(strlen(word) - 1, sizeof(char));
         if (words[i] == NULL) {
             fprintf(stderr, "calloc failed to allocate words[%d]\n", i);
             return NULL;
