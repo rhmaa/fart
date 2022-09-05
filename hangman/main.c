@@ -108,7 +108,9 @@ int go_bananas(char *word)
                (NR_CHANCES - chances_used == 1) ? "chance" : "chances");
 
         print_guesses(guesses);
+
         printf("Your guess: ");
+        guess = 0;
         get_guess(&guess);
 
         if (check_guess(guess, guesses, word) == 1)
@@ -144,16 +146,21 @@ int check_guess(char guess, char *guesses, char *word)
 }
 
 void get_guess(char *guess)
-
 {
     char buffer[MAX_WORD_LEN];
 
     fgets(buffer, MAX_WORD_LEN, stdin);
 
+    /* If the player has typed one character, and then pressed enter,
+     * the buffer should contain two characters (whatever the player
+     * typed and '\n'. If it contains more, then it means the player
+     * entered more than just one character before hitting enter. If
+     * it contains less, then the player just pressed enter.
+     */
     if (strlen(buffer) != 2)
-        printf("\nYou should only enter one character, you naughty boy.\n");
+        printf("\nYou must type one letter, you naughty boy.\n");
     else
-        guess[0] = tolower(buffer[0]);
+        *guess = tolower(buffer[0]);
 }
 
 void print_guesses(char *guesses)
@@ -182,7 +189,7 @@ char ** load_words(char **words, char *filepath)
     /* A word read from the file, stored here temporarily before being
      * saved to words.
      */
-    char word[MAX_WORD_LEN];
+    char tmp[MAX_WORD_LEN];
 
     fp = fopen(filepath, "r");
     if (fp == NULL) {
@@ -207,14 +214,14 @@ char ** load_words(char **words, char *filepath)
     rewind(fp);
 
     for (int i = 0; i < nr_lines; ++i) {
-        fgets(word, MAX_WORD_LEN, fp);
-        words[i] = calloc(strlen(word) - 1, sizeof(char));
+        fgets(tmp, MAX_WORD_LEN, fp);
+        words[i] = calloc(strlen(tmp) - 1, sizeof(char));
         if (words[i] == NULL) {
             fprintf(stderr, "calloc failed to allocate words[%d]\n", i);
             return NULL;
         } else {
-            word[strcspn(word, "\n")] = 0;
-            strncpy(words[i], word, strlen(word));
+            tmp[strcspn(tmp, "\n")] = 0;
+            strncpy(words[i], tmp, strlen(tmp));
         }
     }
 
@@ -226,7 +233,7 @@ char * get_rand_word(char **words)
 {
     srand(time(NULL));
 
-    int nr_words   = sizeof(*words) / sizeof(*words[0]);
+    int nr_words = sizeof(*words) / sizeof(*words[0]);
     int rand_index = rand() % nr_words;
 
     return words[rand_index];
