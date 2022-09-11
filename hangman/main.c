@@ -72,7 +72,11 @@ int main(int argc, char **argv)
         printf("Better luck next time, cunt!\n\n");
 
     free(filepath);
-    free(rand_word);
+
+    int nr_words = sizeof(*words) / sizeof(*words[0]);
+    for (int i = 0; i < nr_words; ++i)
+        free(words[i]);
+
     free(words);
     
     return 0;
@@ -165,6 +169,9 @@ void get_guess(char *guess)
 
 void print_guesses(char *guesses)
 {
+    /* We do all of this instead of printf("\n%s\n\n", guesses)
+     * because we want spaces between the characters.
+     */
     printf("\n");
     
     for (int i = 0; i < strlen(guesses); ++i)
@@ -215,9 +222,9 @@ char ** load_words(char **words, char *filepath)
 
     for (int i = 0; i < nr_lines; ++i) {
         fgets(tmp, MAX_WORD_LEN, fp);
-        words[i] = calloc(strlen(tmp) - 1, sizeof(char));
+        words[i] = malloc(sizeof(char) * strlen(tmp) - 1);
         if (words[i] == NULL) {
-            fprintf(stderr, "calloc failed to allocate words[%d]\n", i);
+            fprintf(stderr, "malloc failed to allocate words[%d]\n", i);
             return NULL;
         } else {
             tmp[strcspn(tmp, "\n")] = 0;
