@@ -15,10 +15,10 @@
 #include <time.h>
 
 /* According to Google, the longest word in the English language is 45
- * characters long.
+ * characters long, we choose 100 as a limit for good measure.
  * www.britannica.com/dictionary/eb/qa/The-Longest-Word-in-the-Dictionary
  */
-#define MAX_WORD_LEN 45
+#define MAX_WORD_LEN 100
 
 /* The number of chances that the user has to guess the right word. */
 #define NR_CHANCES   8
@@ -129,7 +129,11 @@ int go_bananas(char *word)
         }
     }
 
-    print_guesses(guesses);
+    /* We print word here instead of guesses, since we want the player
+     * to know what the correct word was, regardless if they actually
+     * managed to guess it or not.
+     */
+    print_guesses(word);
     free(guesses);
 
     return 0;
