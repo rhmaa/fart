@@ -16,7 +16,8 @@
 /* A credit card number consists of 16 digits. */
 #define CARD_NUM_LEN 16
 
-int check_card(unsigned long);
+int check_input (char *);
+int check_card  (unsigned long);
 
 int main(int argc, char **argv)
 {
@@ -28,15 +29,39 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    unsigned long card_num = strtol(argv[1], NULL, 10);
+    /* card_num is the credit card number that the user entered. */
+    unsigned long card_num;
 
-    /* Check if the credit card is valid. */
+    /* Make sure that the user actually entered a number. */
+    if (check_input(argv[1])) {
+        card_num = strtol(argv[1], NULL, 10);
+    } else {
+        printf("error: Invalid input. Expected an integer.\n");
+        return 1;
+    }
+
+    /* Check if the credit card number is valid. */
     if (check_card(card_num))
         printf("The credit card number is valid.\n");
     else
         printf("The credit card number is invalid.\n");
 
     return 0;
+}
+
+int check_input(char *input)
+{
+    /* Check if the characters that the user entered are digits or
+     * not. If the characters are not within the ASCII range for
+     * digits, this function returns a zero value.
+     */
+    int is_digit = 1;
+
+    for (int i = 0; i < strlen(input); ++i)
+        if (!(48 <= input[i] && input[i] <= 58))
+            is_digit = 0;
+
+    return is_digit ? 1 : 0;
 }
 
 int check_card(unsigned long card_num)
