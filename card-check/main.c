@@ -47,8 +47,6 @@ int check_input(char *input)
      * digits. If any of the characters in the argument are not within
      * the ASCII range for digits, the user's input is not a number.
      */
-    int is_digit = 1;
-
     for (int i = 0; i < strlen(input); ++i)
         if (!(48 <= input[i] && input[i] <= 58))
             return 1;
