@@ -13,23 +13,25 @@
 #include <stdlib.h>
 #include <string.h>
 
-/* A credit card number consists of 16 digits. */
-#define CARD_NUM_LEN 16
+/* A credit card number consists of 13 to 19 digits. */
+#define MIN_CARD_LEN 13
+#define MAX_CARD_LEN 19
 
 int check_input (char *);
-int check_card  (unsigned long);
+int check_card  (unsigned long, int);
 
 int main(int argc, char **argv)
 {
     /* Validate the user's input. */
     if (check_input(argv[1]) == 1) {
-        printf("usage: %s [16 DIGIT INTEGER]\n", argv[0]);
+        printf("usage: %s [%d-%d DIGIT INTEGER]\n",
+               MIN_CARD_LEN, MAX_CARD_LEN, argv[0]);
         return 1;
     }
 
     unsigned long card_num = strtol(argv[1], NULL, 10);
 
-    if (check_card(card_num) == 1)
+    if (check_card(card_num, strlen(argv[1])) == 1)
         printf("The credit card number is invalid.\n");
     else
         printf("The credit card number is valid.\n");
@@ -39,8 +41,8 @@ int main(int argc, char **argv)
 
 int check_input(char *input)
 {
-    /* Check if the user's argument is 16 characters long. */
-    if (strlen(input) != CARD_NUM_LEN)
+    /* Check if the user's argument is between 13 and 19 characters long. */
+    if (!(MIN_CARD_LEN <= strlen(input) && strlen(input) <= MAX_CARD_LEN))
         return 1;
 
     /* Check if the user's argument contains anything other than
@@ -54,18 +56,21 @@ int check_input(char *input)
     return 0;
 }
 
-int check_card(unsigned long card_num)
+int check_card(unsigned long card_num, int card_len)
 {
     /* We check the validity of the credit card number according to
-     * Luhn's algorithm.
-     * https://en.wikipedia.org/wiki/Luhn_algorithm
+     * Luhn's algorithm: https://en.wikipedia.org/wiki/Luhn_algorithm
      */
     int sum = 0;
-    int products[CARD_NUM_LEN / 2] = {};
 
-    for (int i = 0; i < CARD_NUM_LEN / 2; ++i) {
-        /* Add the digits that we'll not be multiplying by 2 to sum.
-         */
+    int *products = malloc(sizeof(int) * (card_len / 2));
+    if (products == NULL) {
+        perror("malloc in check_card() failed");
+        exit(1);
+    }
+
+    for (int i = 0; i < card_len / 2; ++i) {
+        /* Add the digits that we'll not be multiplying to sum. */
         sum += card_num % 10;
         card_num /= 10;
         
@@ -80,6 +85,8 @@ int check_card(unsigned long card_num)
             products[i] /= 10;
         }
     }
+
+    free(products);
 
     /* If the calculated sum is divisible by 10, then the credit card
      * number is valid according to Luhn's algorithm.
