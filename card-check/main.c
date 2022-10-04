@@ -32,9 +32,9 @@ int main(int argc, char **argv)
 
     /* Check if the credit card is valid. */
     if (check_card(card_num))
-        printf("The credit card number is invalid.\n");
-    else
         printf("The credit card number is valid.\n");
+    else
+        printf("The credit card number is invalid.\n");
 
     return 0;
 }
@@ -71,7 +71,7 @@ int check_card(unsigned long card_num)
      * credit card number is valid according to Luhn's algorithm.
      */
     if (sum % 10 == 0)
-        return 0;
-    else
         return 1;
+    else
+        return 0;
 }
