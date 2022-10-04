@@ -24,8 +24,7 @@ int main(int argc, char **argv)
 {
     /* Validate the user's input. */
     if (check_input(argv[1]) == 1) {
-        printf("usage: %s [%d-%d DIGIT INTEGER]\n",
-               MIN_CARD_LEN, MAX_CARD_LEN, argv[0]);
+        printf("usage: %s [%d-%d digits]\n", argv[0], MIN_CARD_LEN, MAX_CARD_LEN);
         return 1;
     }
 
