@@ -1,8 +1,19 @@
+/***********************************************************************
+  A simple program that checks the validity of a credit card number.
+
+  The user enters a credit card number as a command line argument. The
+  user must enter only one number, and it must be 16 digits long.
+
+  The program then checks the validity of the number according to
+  Luhn's algorithm. A message is printed to the user, stating if the
+  number is valid or invalid.
+ ***********************************************************************/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-/* A credit card consists of 16 digits. */
+/* A credit card number consists of 16 digits. */
 #define CARD_NUM_LEN 16
 
 int check_card(unsigned long);
@@ -30,7 +41,11 @@ int main(int argc, char **argv)
 
 int check_card(unsigned long card_num)
 {
-    int sum                        = 0;
+    /* We check the validity of the credit card number according to
+     * Luhn's algorithm.
+     * https://en.wikipedia.org/wiki/Luhn_algorithm
+     */
+    int sum = 0;
     int products[CARD_NUM_LEN / 2] = {};
 
     for (int i = 0; i < CARD_NUM_LEN / 2; ++i) {
