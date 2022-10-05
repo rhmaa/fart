@@ -2,7 +2,7 @@
   A simple program that checks the validity of a credit card number.
 
   The user enters a credit card number as a command line argument. The
-  user must enter only one number, and it must be 16 digits long.
+  user must enter a number that is between 13 and 19 digits long.
 
   The program then checks the validity of the number according to
   Luhn's algorithm. A message is printed to the user, stating if the
@@ -88,10 +88,7 @@ int check_card(unsigned long card_num, int card_len)
     free(products);
 
     /* If the calculated sum is divisible by 10, then the credit card
-     * number is valid according to Luhn's algorithm.
+     * number is valid.
      */
-    if (sum % 10 == 0)
-        return 0;
-    else
-        return 1;
+    return (sum % 10 == 0) ? 0 : 1;
 }
