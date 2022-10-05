@@ -18,11 +18,10 @@
 #define MAX_CARD_LEN 19
 
 int check_input (char *);
-int check_card  (unsigned long, int);
+int check_card  (unsigned long);
 
 int main(int argc, char **argv)
 {
-    /* Validate the user's input. */
     if (check_input(argv[1]) == 1) {
         printf("usage: %s [%d-%d digits]\n", argv[0], MIN_CARD_LEN, MAX_CARD_LEN);
         return 1;
@@ -30,7 +29,7 @@ int main(int argc, char **argv)
 
     unsigned long card_num = strtol(argv[1], NULL, 10);
 
-    if (check_card(card_num, strlen(argv[1])) == 1)
+    if (check_card(card_num) == 1)
         printf("The credit card number is invalid.\n");
     else
         printf("The credit card number is valid.\n");
@@ -40,13 +39,14 @@ int main(int argc, char **argv)
 
 int check_input(char *input)
 {
-    /* Check if the user's argument is between 13 and 19 characters long. */
+    /* Check if the input is long enough to be a valid number.
+     */
     if (!(MIN_CARD_LEN <= strlen(input) && strlen(input) <= MAX_CARD_LEN))
         return 1;
 
-    /* Check if the user's argument contains anything other than
-     * digits. If any of the characters in the argument are not within
-     * the ASCII range for digits, the user's input is not a number.
+    /* Check if the input contains anything other than digits. If any
+     * of the characters in the input are not within the ASCII range
+     * for digits, the input is not a number.
      */
     for (int i = 0; i < strlen(input); ++i)
         if (!(48 <= input[i] && input[i] <= 58))
@@ -55,33 +55,29 @@ int check_input(char *input)
     return 0;
 }
 
-int check_card(unsigned long card_num, int card_len)
+int check_card(unsigned long card_num)
 {
-    int sum     = 0;
-    int product = 0;
+    int sum = 0;
     
-    /* Check the validity of the credit card number according to
-     * Luhn's algorithm: https://en.wikipedia.org/wiki/Luhn_algorithm
+    /* Check the validity of the number according to Luhn's algorithm:
+     * https://en.wikipedia.org/wiki/Luhn_algorithm
      */
-    for (int i = 0; i < card_len / 2; ++i) {
+    while (card_num > 0) {
         /* Add the digits that we'll not be multiplying to sum. */
         sum += card_num % 10;
-        card_num /= 10;
+        card_num = card_num / 10;
         
-        /* Multiply every other digit by 2, starting with the credit
-         * card number's second-to-last digit. Then add the digits of
-         * the products to sum.
+        /* Multiply every other digit by 2, starting with the number's
+         * second-to-last digit. Add the digits of the product to sum.
          */
-        product = (card_num % 10) * 2;
-        card_num /= 10;
-        while (product) {
+        int product = (card_num % 10) * 2;
+        card_num = card_num / 10;
+        while (product > 0) {
             sum += product % 10;
             product /= 10;
         }
     }
 
-    /* If the calculated sum is divisible by 10, then the credit card
-     * number is valid.
-     */
+    /* If the sum is divisible by 10, the number is valid. */
     return (sum % 10 == 0) ? 0 : 1;
 }
