@@ -57,17 +57,12 @@ int check_input(char *input)
 
 int check_card(unsigned long card_num, int card_len)
 {
-    /* We check the validity of the credit card number according to
+    int sum     = 0;
+    int product = 0;
+    
+    /* Check the validity of the credit card number according to
      * Luhn's algorithm: https://en.wikipedia.org/wiki/Luhn_algorithm
      */
-    int sum = 0;
-
-    int *products = malloc(sizeof(int) * (card_len / 2));
-    if (products == NULL) {
-        perror("malloc in check_card() failed");
-        exit(1);
-    }
-
     for (int i = 0; i < card_len / 2; ++i) {
         /* Add the digits that we'll not be multiplying to sum. */
         sum += card_num % 10;
@@ -77,15 +72,13 @@ int check_card(unsigned long card_num, int card_len)
          * card number's second-to-last digit. Then add the digits of
          * the products to sum.
          */
-        products[i] = (card_num % 10) * 2;
+        product = (card_num % 10) * 2;
         card_num /= 10;
-        while (products[i]) {
-            sum += products[i] % 10;
-            products[i] /= 10;
+        while (product) {
+            sum += product % 10;
+            product /= 10;
         }
     }
-
-    free(products);
 
     /* If the calculated sum is divisible by 10, then the credit card
      * number is valid.
