@@ -112,7 +112,7 @@ int get_menu_ans()
 
 void get_index(int nr_people, int *index)
 {
-    printf("Enter the index of the person to delete: ");
+    printf("Enter the index of the person: ");
     do {
         if (get_int(index) != 0) {
             printf("error: Invalid input.\n");

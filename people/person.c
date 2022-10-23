@@ -24,6 +24,13 @@ void edit_person(person *people, int index)
     get_sex(&sex);
     get_age(&age);
 
+    memset(people[index].name, 0, strlen(people[index].name));
+    char *tmp = realloc(people[index].name, strlen(name));
+    if (tmp == NULL) {
+        perror("realloc in edit_person failed");
+        exit(1);
+    }
+    people[index].name = tmp;
     strncpy(people[index].name, name, strlen(name));
     people[index].sex = sex;
     people[index].age = age;
@@ -118,7 +125,6 @@ void sort_people(person *people, int nr_people)
 
 void list_people(person *people, int nr_people)
 {
-
     if (nr_people != 0) {
         for (int i = 0; i < nr_people; ++i)
             printf("%d\t%s\t%s\t%d\n", i, people[i].name, people[i].sex ? "M" : "F", people[i].age);
@@ -143,10 +149,14 @@ void rename_person(person *people, int index)
         /* When we enter a name that is shorter than the original
          * name, the last letters of the first name will still be
          * present in the person's name.
-         *
-         * TODO(rha): Implement code that trims the remaining letters
-         * from the original name.
          */
+        memset(people[index].name, 0, strlen(people[index].name));
+        char *tmp = realloc(people[index].name, strlen(name));
+        if (tmp == NULL) {
+            perror("realloc in rename_person failed");
+            exit(1);
+        }
+        people[index].name = tmp;
         strncpy(people[index].name, name, strlen(name));
     } else {
         perror("fgets in rename_person could not write to name");
@@ -251,7 +261,7 @@ void get_sex(unsigned int *sex)
 {
     printf("Please enter the person's sex (0 for female or 1 for male): ");
     do {
-        if (get_int(sex) != 0) {
+        if (get_int(sex) != 0 && !(0 <= *sex && *sex <= 1)) {
             printf("error: Expected an integer input.\n");
             printf("Please enter a valid sex: ");
         }
