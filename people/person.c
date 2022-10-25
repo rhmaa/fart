@@ -279,19 +279,10 @@ int get_int(int *a)
      * are not within the ASCII range for digits, this function
      * returns a non-zero value.
      */
-    int is_digit = 1;
+    for (int i = 0, n = strlen(buffer); i < n; ++i)
+        if (!(48 <= buffer[i] && buffer[i] <= 58))
+          return 1;
 
-    for (int i = 0, n = strlen(buffer); i < n; ++i) {
-        if (!(48 <= buffer[i] && buffer[i] <= 58)) {
-            is_digit = 0;
-            break;
-        }
-    }
-
-    if (is_digit) {
-        *a = atoi(buffer);
-        return 0;
-    } else {
-        return 1;
-    }
+    *a = atoi(buffer);
+    return 0;
 }
