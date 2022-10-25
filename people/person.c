@@ -1,3 +1,4 @@
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -263,25 +264,39 @@ void get_age(unsigned int *age)
     }
 }
 
+char * get_str()
+{
+    char *str = calloc(MAX_STR_LEN, sizeof(char));
+    if (str == NULL) {
+        perror("calloc in get_str failed");
+        exit(1);
+    }
+
+    fgets(str, MAX_STR_LEN, stdin);
+    if (str == NULL) {
+        perror("fgets in get_str failed");
+        return NULL;
+    }
+
+    str[strcspn(str, "\n")] = '\0';
+    return str;
+}
+
 int get_int(int *a)
 {
-    /* Taking integer input from the user in C is unreliable at
-     * most. This is a simple function that should be somewhat safer
-     * than the default methods.
-     */
-    char buffer[MAX_STR_LEN];
+    char *s = get_str();
 
-    fgets(buffer, MAX_STR_LEN, stdin);
-    buffer[strcspn(buffer, "\n")] = 0;
-
-    /* Check if the characters are digits or not. If the characters
-     * are not within the ASCII range for digits, this function
-     * returns a non-zero value.
+    /* Check if the user's input only contains digits. Account for
+     * signed integers.
      */
-    for (int i = 0, n = strlen(buffer); i < n; ++i)
-        if (!(48 <= buffer[i] && buffer[i] <= 58))
+    for (char *t = (*s == '-' ? s + 1 : s); *t; ++t) {
+        if (!isdigit(*t)) {
+            free(s);
             return 1;
+        }
+    }
 
-    *a = atoi(buffer);
+    *a = strtol(s, NULL, 10);
+    free(s);
     return 0;
 }

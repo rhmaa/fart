@@ -36,9 +36,10 @@ int  load_people    (person **, int *);
 void destroy_people (person *,  int);
 void birthday       (person *,  int);
 
-void get_name (char *);
-void get_sex  (unsigned int *);
-void get_age  (unsigned int *);
-int  get_int  (int *);
+void   get_name (char *);
+void   get_sex  (unsigned int *);
+void   get_age  (unsigned int *);
+char * get_str  ();
+int    get_int  (int *);
 
 #endif /* PERSON_H_ */
