@@ -167,17 +167,9 @@ void rename_person(person *people, int index)
 void save_people(person *people, int nr_people)
 {
     FILE *savefile;
-    char filepath[MAX_STR_LENGTH];
 
-    /* Determine which directory to place the save file in, depending
-     * on the type of operating system that the user has. If they're
-     * not on Windows, then we assume they are using a Unix system.
-     */
-#ifdef _WIN32
-    strcpy(filepath, "\%userprofile\%\\AppData\\Local\\Temp\\people");
-#else
-    strcpy(filepath, "/tmp/people");
-#endif
+    char filepath[MAX_STR_LENGTH];
+    strcpy(filepath, SAVEFILE);
 
     savefile = fopen(filepath, "w+");
 
@@ -197,16 +189,7 @@ int load_people(person **people, int *nr_people)
     FILE *savefile;
 
     char filepath[MAX_STR_LENGTH];
-
-    /* Determine which directory to place the save file in, depending
-     * on the type of operating system that the user has. If they're
-     * not on Windows, then we assume they are using a Unix system.
-     */
-#ifdef _WIN32
-    strcpy(filepath, "\%userprofile\%\\AppData\\Local\\Temp\\people");
-#else
-    strcpy(filepath, "/tmp/people");
-#endif
+    strcpy(filepath, SAVEFILE);
 
     if (savefile = fopen(filepath, "r"))
         fscanf(savefile, "%d", nr_people);
@@ -261,8 +244,12 @@ void get_sex(unsigned int *sex)
 {
     printf("Please enter the person's sex (0 for female or 1 for male): ");
     do {
-        if (get_int(sex) != 0 && !(0 <= *sex && *sex <= 1)) {
+        if (get_int(sex) != 0) {
             printf("error: Expected an integer input.\n");
+            printf("Please enter a valid sex: ");
+        }
+        if (!(0 <= *sex && *sex <= 1)) {
+            printf("error: Expected 0 for female or 1 for male.\n");
             printf("Please enter a valid sex: ");
         }
     } while (!(0 <= *sex && *sex <= 1));
@@ -280,8 +267,8 @@ void get_age(unsigned int *age)
 int get_int(int *a)
 {
     /* Taking integer input from the user in C is unreliable at
-     * most. This is a simple function that should be somewhat more
-     * safer than the default methods.
+     * most. This is a simple function that should be somewhat safer
+     * than the default methods.
      */
     char buffer[MAX_STR_LENGTH];
 
@@ -294,9 +281,12 @@ int get_int(int *a)
      */
     int is_digit = 1;
 
-    for (int i = 0; i < strlen(buffer); ++i)
-        if (!(48 <= buffer[i] && buffer[i] <= 58))
+    for (int i = 0, n = strlen(buffer); i < n; ++i) {
+        if (!(48 <= buffer[i] && buffer[i] <= 58)) {
             is_digit = 0;
+            break;
+        }
+    }
 
     if (is_digit) {
         *a = atoi(buffer);
