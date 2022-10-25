@@ -17,5 +17,5 @@ int main(int argc, char **argv)
         if (*s1 == '\0')
             return 0;
 
-    return (*s1 < *s2 ? 1 : 0);
+    return s1 < s2 ? 1 : 0;
 }
