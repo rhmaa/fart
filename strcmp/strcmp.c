@@ -3,6 +3,10 @@
  * them. If the strings are equal, then this program returns a zero
  * value. Note that you must use an external program to actually print
  * the results of this comparison.
+ * 
+ * If the strings are equal, return 0. If the strings are not equal,
+ * return -1. If the user has entered an incorrect number of strings,
+ * return 1.
  */
 
 int main(int argc, char **argv)
@@ -17,5 +21,5 @@ int main(int argc, char **argv)
         if (*s1 == '\0')
             return 0;
 
-    return s1 < s2 ? 1 : 0;
+    return -1;
 }
