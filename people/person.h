@@ -4,7 +4,7 @@
 /* It's very unlikely that we'll have strings longer than 1024 in this
  * program.
  */
-#define MAX_STR_LENGTH 1024
+#define MAX_STR_LEN 1024
 
 /* Determine which directory to place the save file in, depending on
  * the type of operating system that the user has. If they're not on

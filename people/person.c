@@ -6,7 +6,7 @@
 
 void make_person(person *people, int index)
 {
-    people[index].name = calloc(MAX_STR_LENGTH, sizeof(char));
+    people[index].name = calloc(MAX_STR_LEN, sizeof(char));
     if (people[index].name == NULL) {
         perror("calloc in make_person() failed");
         exit(1);
@@ -16,7 +16,7 @@ void make_person(person *people, int index)
 
 void edit_person(person *people, int index)
 {
-    char name[MAX_STR_LENGTH];
+    char name[MAX_STR_LEN];
     int  sex;
     int  age;
 
@@ -141,9 +141,9 @@ void destroy_people(person *people, int nr_people)
 
 void rename_person(person *people, int index)
 {
-    char name[MAX_STR_LENGTH];
+    char name[MAX_STR_LEN];
     printf("Please enter %s's new name: ", people[index].name);
-    if (fgets(name, MAX_STR_LENGTH, stdin) != NULL) {
+    if (fgets(name, MAX_STR_LEN, stdin) != NULL) {
         name[strcspn(name, "\n")] = 0;
 
         /* When we enter a name that is shorter than the original
@@ -168,7 +168,7 @@ void save_people(person *people, int nr_people)
 {
     FILE *savefile;
 
-    char filepath[MAX_STR_LENGTH];
+    char filepath[MAX_STR_LEN];
     strcpy(filepath, SAVEFILE);
 
     savefile = fopen(filepath, "w+");
@@ -188,7 +188,7 @@ int load_people(person **people, int *nr_people)
 {
     FILE *savefile;
 
-    char filepath[MAX_STR_LENGTH];
+    char filepath[MAX_STR_LEN];
     strcpy(filepath, SAVEFILE);
 
     if (savefile = fopen(filepath, "r"))
@@ -205,7 +205,7 @@ int load_people(person **people, int *nr_people)
             *people = tmp;
         }
 
-        char name[MAX_STR_LENGTH];
+        char name[MAX_STR_LEN];
         unsigned int sex;
         unsigned int age;
 
@@ -232,7 +232,7 @@ void birthday(person *people, int index)
 void get_name(char *name)
 {
     printf("Please enter the person's name: ");
-    if (fgets(name, MAX_STR_LENGTH, stdin) != NULL) {
+    if (fgets(name, MAX_STR_LEN, stdin) != NULL) {
         name[strcspn(name, "\n")] = 0;
     } else {
         perror("fgets in get_name could not write to name");
@@ -270,9 +270,9 @@ int get_int(int *a)
      * most. This is a simple function that should be somewhat safer
      * than the default methods.
      */
-    char buffer[MAX_STR_LENGTH];
+    char buffer[MAX_STR_LEN];
 
-    fgets(buffer, MAX_STR_LENGTH, stdin);
+    fgets(buffer, MAX_STR_LEN, stdin);
     buffer[strcspn(buffer, "\n")] = 0;
 
     /* Check if the characters are digits or not. If the characters
@@ -281,7 +281,7 @@ int get_int(int *a)
      */
     for (int i = 0, n = strlen(buffer); i < n; ++i)
         if (!(48 <= buffer[i] && buffer[i] <= 58))
-          return 1;
+            return 1;
 
     *a = atoi(buffer);
     return 0;
