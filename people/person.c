@@ -247,8 +247,7 @@ void get_sex(unsigned int *sex)
         if (get_int(sex) != 0) {
             printf("error: Expected an integer input.\n");
             printf("Please enter a valid sex: ");
-        }
-        if (!(0 <= *sex && *sex <= 1)) {
+        } else if (!(0 <= *sex && *sex <= 1)) {
             printf("error: Expected 0 for female or 1 for male.\n");
             printf("Please enter a valid sex: ");
         }
