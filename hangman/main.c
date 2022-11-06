@@ -42,22 +42,24 @@ int main(int argc, char **argv)
 	/* The full path to the file from which we get our words. */
 	char *filepath;
 
-	if (argc != 2) {
+	if (argc != 2)
+	{
 		printf("usage: %s [FILE]\n", argv[0]);
 		return 1;
-	} else {
-		filepath = calloc(strlen(argv[1]), sizeof(char));
-		if (filepath == NULL) {
-			perror("calloc in main failed");
-			return 1;
-		} else {
-			strncpy(filepath, argv[1], strlen(argv[1]));
-		}
 	}
+
+	filepath = malloc(strlen(argv[1]) + 1);
+	if (filepath == NULL)
+	{
+		perror("calloc in main failed");
+		return 1;
+	}
+	strncpy(filepath, argv[1], strlen(argv[1]) + 1);
 
 	/* Load the words from a file and pick one at random. */
 	words = load_words(words, filepath);
-	if (words == NULL) {
+	if (words == NULL)
+	{
 		perror("load_words in main failed");
 		return 1;
 	}
